@@ -1,0 +1,84 @@
+﻿<!-- ЗАВДАННЯ i: адмін-сторінка — таблиця користувачів, пошук, сортування, активація, блокування.
+     ЗАВДАННЯ v: кнопки й пункти меню прив'язані до команд (Command="{Binding ...}") -->
+<Window x:Class="AdminPanel.WPF.UsersWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:AdminPanel.ViewModels;assembly=AdminPanel.ViewModels"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:UsersViewModel}"
+        Title="Керування користувачами" Width="820" Height="520" MinWidth="640" MinHeight="380"
+        WindowStartupLocation="CenterOwner" Background="{StaticResource WindowBackgroundBrush}"
+        Loaded="Window_Loaded">
+
+    <!-- ЗАВДАННЯ v: клавіша F5 виконує ту саму команду, що й пункт меню «Оновити» -->
+    <Window.InputBindings>
+        <KeyBinding Key="F5" Command="{Binding LoadCommand}" />
+    </Window.InputBindings>
+
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_Користувачі">
+                <MenuItem Header="_Оновити" Command="{Binding LoadCommand}" InputGestureText="F5" />
+                <MenuItem Header="_Активувати" Command="{Binding ActivateCommand}" />
+                <MenuItem Header="_Заблокувати" Command="{Binding BlockCommand}" />
+                <Separator />
+                <MenuItem Header="З_акрити" Click="MenuClose_Click" />
+            </MenuItem>
+        </Menu>
+
+        <!-- Лічильники користувачів -->
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem>
+                <TextBlock>
+                    <Run Text="Усього:" /> <Run Text="{Binding TotalCount, Mode=OneWay}" FontWeight="SemiBold" />
+                    <Run Text="· активних:" /> <Run Text="{Binding ActiveCount, Mode=OneWay}" />
+                    <Run Text="· очікують:" /> <Run Text="{Binding PendingCount, Mode=OneWay}" />
+                    <Run Text="· заблокованих:" /> <Run Text="{Binding BlockedCount, Mode=OneWay}" />
+                </TextBlock>
+            </StatusBarItem>
+            <Separator />
+            <StatusBarItem>
+                <TextBlock Text="{Binding StatusMessage}" />
+            </StatusBarItem>
+        </StatusBar>
+
+        <!-- Роль: «робити пошук, сортувати» -->
+        <WrapPanel DockPanel.Dock="Top" Margin="10,10,10,0">
+            <Label Content="_Пошук за логіном:" Target="{Binding ElementName=txtSearch}" VerticalAlignment="Center" />
+            <TextBox x:Name="txtSearch" Width="180" VerticalAlignment="Center"
+                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+
+            <Label Content="_Сортувати за:" Target="{Binding ElementName=cmbSort}" VerticalAlignment="Center" />
+            <ComboBox x:Name="cmbSort" Width="150" VerticalAlignment="Center" Margin="0,0,10,0"
+                      ItemsSource="{Binding SortOptions}" DisplayMemberPath="Title"
+                      SelectedItem="{Binding SelectedSort}" />
+            <CheckBox Content="за спаданням" VerticalAlignment="Center" IsChecked="{Binding SortDescending}" />
+        </WrapPanel>
+
+        <!-- Роль: «активувати accounts або блокувати їх».
+             Кнопка неактивна, коли CanExecute команди = false (наприклад, себе заблокувати не можна) -->
+        <DockPanel DockPanel.Dock="Bottom" Margin="10,0,10,10" LastChildFill="True">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button Content="Активувати" Style="{StaticResource SuccessButton}" Command="{Binding ActivateCommand}" />
+                <Button Content="Заблокувати" Style="{StaticResource DangerButton}" Margin="0"
+                        Command="{Binding BlockCommand}" />
+            </StackPanel>
+            <TextBlock Style="{StaticResource ErrorText}" VerticalAlignment="Center" Text="{Binding ErrorMessage}" />
+        </DockPanel>
+
+        <!-- Роль: «бачить таблицю користувачів».
+             ЗАВДАННЯ vii: стовпці «Роль» і «Стан» використовують шаблони даних зі Styles.xaml -->
+        <DataGrid Margin="10" ItemsSource="{Binding Users}" SelectedItem="{Binding SelectedUser}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding UserId}" Width="50" />
+                <DataGridTextColumn Header="Логін" Binding="{Binding LoginText}" Width="*" />
+                <DataGridTemplateColumn Header="Роль" Width="130" CellTemplate="{StaticResource RoleTemplate}" />
+                <DataGridTemplateColumn Header="Стан" Width="150" CellTemplate="{StaticResource StatusBadgeTemplate}" />
+                <DataGridTextColumn Header="Зареєстровано" Width="140"
+                                    Binding="{Binding CreatedAt, StringFormat={}{0:dd.MM.yyyy HH:mm}}" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</Window>

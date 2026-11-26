@@ -1,0 +1,157 @@
+﻿<!-- ЗАВДАННЯ vii (дизайн): усі стилі й шаблони застосунку в одному словнику ресурсів.
+     Підключається в App.xaml, тому діє в усіх вікнах -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:vm="clr-namespace:AdminPanel.ViewModels;assembly=AdminPanel.ViewModels">
+
+    <!-- Кольори (ресурси) -->
+    <SolidColorBrush x:Key="AccentBrush" Color="#FF1F6FB2" />
+    <SolidColorBrush x:Key="SuccessBrush" Color="#FF2E7D32" />
+    <SolidColorBrush x:Key="DangerBrush" Color="#FFC62828" />
+    <SolidColorBrush x:Key="MutedTextBrush" Color="#FF6B6B6B" />
+    <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#FFF3F5F8" />
+    <SolidColorBrush x:Key="CardBorderBrush" Color="#FFDDE2E8" />
+
+    <!-- Конвертер: true → Visible, false → Collapsed (для меню адміністратора) -->
+    <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+
+    <!-- ЗАВДАННЯ vii: стилі тексту -->
+    <Style x:Key="TitleText" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="22" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Margin" Value="0,0,0,8" />
+    </Style>
+
+    <Style x:Key="HintText" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style x:Key="ErrorText" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource DangerBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <!-- ЗАВДАННЯ vii: картка з заокругленими кутами -->
+    <Style x:Key="Card" TargetType="Border">
+        <Setter Property="Background" Value="White" />
+        <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="20" />
+    </Style>
+
+    <!-- ЗАВДАННЯ vi + vii: шаблон помилки валідації (ControlTemplate):
+         червона рамка навколо поля і знак «!» праворуч -->
+    <ControlTemplate x:Key="ValidationErrorTemplate">
+        <DockPanel LastChildFill="True">
+            <TextBlock DockPanel.Dock="Right" Text="!" Foreground="{StaticResource DangerBrush}" FontWeight="Bold"
+                       Margin="4,0,0,0" VerticalAlignment="Center" />
+            <Border BorderBrush="{StaticResource DangerBrush}" BorderThickness="1">
+                <AdornedElementPlaceholder />
+            </Border>
+        </DockPanel>
+    </ControlTemplate>
+
+    <!-- Неявний стиль (без x:Key): діє на всі TextBox застосунку.
+         ЗАВДАННЯ vi: якщо є помилка, текст помилки показується у підказці (ToolTip) -->
+    <Style TargetType="TextBox">
+        <Setter Property="Padding" Value="4,3" />
+        <Setter Property="Margin" Value="0,0,12,0" />
+        <Setter Property="Validation.ErrorTemplate" Value="{StaticResource ValidationErrorTemplate}" />
+        <Style.Triggers>
+            <Trigger Property="Validation.HasError" Value="True">
+                <Setter Property="ToolTip"
+                        Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)/ErrorContent}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="PasswordBox">
+        <Setter Property="Padding" Value="4,3" />
+        <Setter Property="Margin" Value="0,0,12,0" />
+    </Style>
+
+    <!-- ЗАВДАННЯ vii: власний ControlTemplate для кнопки + тригери (наведення, натискання, неактивна) -->
+    <Style x:Key="PrimaryButton" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Padding" Value="14,5" />
+        <Setter Property="Margin" Value="0,0,6,0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="5"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Opacity" Value="0.85" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Opacity" Value="0.7" />
+                        </Trigger>
+                        <!-- Коли CanExecute команди = false, кнопка стає блідою -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Opacity" Value="0.4" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ЗАВДАННЯ vii: BasedOn — успадковуємо стиль і міняємо лише колір -->
+    <Style x:Key="SuccessButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+        <Setter Property="Background" Value="{StaticResource SuccessBrush}" />
+    </Style>
+
+    <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+        <Setter Property="Background" Value="{StaticResource DangerBrush}" />
+    </Style>
+
+    <!-- ЗАВДАННЯ vii: неявний стиль для всіх DataGrid -->
+    <Style TargetType="DataGrid">
+        <Setter Property="AutoGenerateColumns" Value="False" />
+        <Setter Property="IsReadOnly" Value="True" />
+        <Setter Property="SelectionMode" Value="Single" />
+        <Setter Property="CanUserSortColumns" Value="False" />
+        <Setter Property="HeadersVisibility" Value="Column" />
+        <Setter Property="GridLinesVisibility" Value="Horizontal" />
+        <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource CardBorderBrush}" />
+        <Setter Property="AlternatingRowBackground" Value="#FFF8FAFC" />
+        <Setter Property="RowHeight" Value="30" />
+    </Style>
+
+    <!-- ЗАВДАННЯ vii: шаблон даних (DataTemplate + DataTrigger) — кольоровий бейдж стану:
+         жовтий — очікує, зелений — активний, червоний — заблокований -->
+    <DataTemplate x:Key="StatusBadgeTemplate" DataType="{x:Type vm:UserListItem}">
+        <Border x:Name="badge" CornerRadius="9" Padding="8,1" HorizontalAlignment="Left" Background="#FFFFF3CD">
+            <TextBlock x:Name="text" Text="{Binding StatusText}" FontWeight="SemiBold" Foreground="#FF8A6D00" />
+        </Border>
+        <DataTemplate.Triggers>
+            <DataTrigger Binding="{Binding Status}" Value="Active">
+                <Setter TargetName="badge" Property="Background" Value="#FFDFF5E1" />
+                <Setter TargetName="text" Property="Foreground" Value="#FF2E7D32" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status}" Value="Blocked">
+                <Setter TargetName="badge" Property="Background" Value="#FFFDE2E2" />
+                <Setter TargetName="text" Property="Foreground" Value="#FFC62828" />
+            </DataTrigger>
+        </DataTemplate.Triggers>
+    </DataTemplate>
+
+    <!-- ЗАВДАННЯ vii: шаблон даних для ролі — адміністратора виділяємо жирним синім -->
+    <DataTemplate x:Key="RoleTemplate" DataType="{x:Type vm:UserListItem}">
+        <TextBlock x:Name="role" Text="{Binding RoleText}" VerticalAlignment="Center" />
+        <DataTemplate.Triggers>
+            <DataTrigger Binding="{Binding IsAdmin}" Value="True">
+                <Setter TargetName="role" Property="FontWeight" Value="Bold" />
+                <Setter TargetName="role" Property="Foreground" Value="{StaticResource AccentBrush}" />
+            </DataTrigger>
+        </DataTemplate.Triggers>
+    </DataTemplate>
+
+</ResourceDictionary>

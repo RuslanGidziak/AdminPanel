@@ -1,0 +1,14 @@
+﻿<!-- StartupUri немає: перше вікно відкриває App.xaml.cs через контейнер DI -->
+<Application x:Class="AdminPanel.WPF.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             DispatcherUnhandledException="App_DispatcherUnhandledException">
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- ЗАВДАННЯ vii: підключаємо стилі й шаблони для всіх вікон -->
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
